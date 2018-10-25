@@ -23,3 +23,9 @@ http://www.ke.tu-darmstadt.de/lehre/arbeiten/diplom/2005/Wolf_Michael.pdf
 
 * An article from MIT discussing best approaches to win the game: good for understanding  
 http://web.mit.edu/sp.268/www/risk.pdf
+
+
+---
+
+* Google Framework Dopamine: Dopamine is a research framework for fast prototyping of reinforcement learning algorithms.  
+https://github.com/google/dopamine
