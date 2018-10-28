@@ -1,2 +1,0 @@
-# WarlightAI
-simple warlight bot
