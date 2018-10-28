@@ -51,7 +51,23 @@ public class SmartBotStarter implements Bot
 
         return preferredStartingRegions;
     }
+    private boolean isBorder(Region region, String myName){
 
+        LinkedList<Region> neighbors = region.getNeighbors();
+
+        int numNeighborsChecked = 0;
+        while(numNeighborsChecked < neighbors.size()){
+
+            if(!neighbors.get(numNeighborsChecked).ownedByPlayer(myName)){
+
+                // add it to list then exit while loop
+                return true;
+            }
+            numNeighborsChecked++;
+        }
+
+        return false;
+    }
     @Override
     /**
      * This method is called for at first part of each round. This example puts two armies on random regions
@@ -67,21 +83,15 @@ public class SmartBotStarter implements Bot
         int armiesLeft = state.getStartingArmies();
         LinkedList<Region> visibleRegions = state.getVisibleMap().getRegions();
 
-        while(armiesLeft > 0)
-        {
-            //Instead of randomly placing them we will place our armies on the borders
-//            double rand = Math.random();
-//            int r = (int) (rand*visibleRegions.size());
-//            Region region = visibleRegions.get(r);
 
-            LinkedList<Region> myRegions = state.ownedRegionsByPlayer(myName);
-            Region region = myRegions.get(r);
-
-
-            if(region.ownedByPlayer(myName))
-            {
-                placeArmiesMoves.add(new PlaceArmiesMove(myName, region, armies));
-                armiesLeft -= armies;
+        while(armiesLeft > 0) {
+            for (Region fromRegion : state.getVisibleMap().getRegions()) {
+                //Instead of randomly placing them we will place our armies on the borders
+                if (fromRegion.ownedByPlayer(myName) && isBorder(fromRegion, myName)) //do an attack
+                {
+                    placeArmiesMoves.add(new PlaceArmiesMove(myName, fromRegion, armies));
+                    armiesLeft -= armies;
+                }
             }
         }
 
@@ -113,7 +123,7 @@ public class SmartBotStarter implements Bot
                     int r = (int) (rand*possibleToRegions.size());
                     Region toRegion = possibleToRegions.get(r);
 
-                    if(!toRegion.getPlayerName().equals(myName) && fromRegion.getArmies() > 6) //do an attack
+                    if(!toRegion.getPlayerName().equals(myName) && fromRegion.getArmies() > 9) //do an attack
                     {
                         attackTransferMoves.add(new AttackTransferMove(myName, fromRegion, toRegion, armies));
                         break;
