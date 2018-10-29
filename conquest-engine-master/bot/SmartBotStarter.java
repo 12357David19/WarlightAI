@@ -51,6 +51,7 @@ public class SmartBotStarter implements Bot
 
         return preferredStartingRegions;
     }
+    //From https://github.com/mbillig/RiskBots
     private boolean isBorder(Region region, String myName){
 
         LinkedList<Region> neighbors = region.getNeighbors();
@@ -101,14 +102,14 @@ public class SmartBotStarter implements Bot
     @Override
     /**
      * This method is called for at the second part of each round. This example attacks if a region has
-     * more than 6 armies on it, and transfers if it has less than 6 and a neighboring owned region.
+     * more than 9 armies on it, and transfers if it has less than 6 and a neighboring owned region.
      * @return The list of PlaceArmiesMoves for one round
      */
     public ArrayList<AttackTransferMove> getAttackTransferMoves(BotState state, Long timeOut)
     {
         ArrayList<AttackTransferMove> attackTransferMoves = new ArrayList<AttackTransferMove>();
         String myName = state.getMyPlayerName();
-        int armies = 5;
+        int armies = 1;
 
         for(Region fromRegion : state.getVisibleMap().getRegions())
         {
@@ -128,7 +129,7 @@ public class SmartBotStarter implements Bot
                         attackTransferMoves.add(new AttackTransferMove(myName, fromRegion, toRegion, armies));
                         break;
                     }
-                    else if(toRegion.getPlayerName().equals(myName) && fromRegion.getArmies() > 1) //do a transfer
+                    else if(toRegion.getPlayerName().equals(myName) && fromRegion.getArmies() > 6) //do a transfer
                     {
                         attackTransferMoves.add(new AttackTransferMove(myName, fromRegion, toRegion, armies));
                         break;
