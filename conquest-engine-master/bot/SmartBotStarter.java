@@ -34,21 +34,35 @@ public class SmartBotStarter implements Bot
      */
     public ArrayList<Region> getPreferredStartingRegions(BotState state, Long timeOut)
     {
-        int m = 6;
+
         ArrayList<Region> preferredStartingRegions = new ArrayList<Region>();
-        for(int i=0; i<m; i++)
-        {
-            double rand = Math.random();
-            int r = (int) (rand*state.getPickableStartingRegions().size());
-            int regionId = state.getPickableStartingRegions().get(r).getId();
-            Region region = state.getFullMap().getRegion(regionId);
+        ArrayList<Region> pickableRegions = state.getPickableStartingRegions();
 
-            if(!preferredStartingRegions.contains(region))
-                preferredStartingRegions.add(region);
-            else
-                i--;
+        for (Region region : pickableRegions) {
+            //these regions picked because of their bonuses and locations
+            switch (region.getId()) {
+                case 41:
+                    preferredStartingRegions.add(1, region);
+                    break;
+                case 12:
+                    preferredStartingRegions.add(2, region);
+                    break;
+                case 40:
+                    preferredStartingRegions.add(3, region);
+                    break;
+                case 11:
+                    preferredStartingRegions.add(4, region);
+                    break;
+                case 21:
+                    preferredStartingRegions.add(5, region);
+                    break;
+                case 23:
+                    preferredStartingRegions.add(6, region);
+                    break;
+
+
+            }
         }
-
         return preferredStartingRegions;
     }
     //From https://github.com/mbillig/RiskBots
