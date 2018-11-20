@@ -469,7 +469,7 @@ public class RunGame
 
 		Player winner = this.engine.winningPlayer();
 		int score = this.engine.getRoundNr() - 1;
-//		System.out.println(winner.getName());
+		System.out.println(winner.getName());
 		System.out.println(score);
 
 		// DBCollection coll = db.getCollection("games");

@@ -61,13 +61,31 @@ public class Engine {
 	
 	public void playRound()
 	{
-		getMoves(player1.getBot().getPlaceArmiesMoves(2000), player1);
-		getMoves(player2.getBot().getPlaceArmiesMoves(2000), player2);
+        String player1PlaceArmiesMoves = player1.getBot().getPlaceArmiesMoves(2000);
+        String player2PlaceArmiesMoves = player2.getBot().getPlaceArmiesMoves(2000);
+
+        System.out.println(roundNr);
+        System.out.println("-----------");
+        System.out.println(player1PlaceArmiesMoves);
+        System.out.println("-----------");
+        System.out.println(player2PlaceArmiesMoves);
+
+		getMoves(player1PlaceArmiesMoves, player1);
+		getMoves(player2PlaceArmiesMoves, player2);
 		
 		executePlaceArmies();
+
+        String player1AttackTransferMoves = player1.getBot().getAttackTransferMoves(2000);
+        String player2AttackTransferMoves = player2.getBot().getAttackTransferMoves(2000);
+
+        System.out.println("-----------");
+        System.out.println(player1AttackTransferMoves);
+        System.out.println("-----------");
+        System.out.println(player2AttackTransferMoves);
+        System.out.println("===========");
 		
-		getMoves(player1.getBot().getAttackTransferMoves(2000), player1);
-		getMoves(player2.getBot().getAttackTransferMoves(2000), player2);
+		getMoves(player1AttackTransferMoves, player1);
+		getMoves(player2AttackTransferMoves, player2);
 		
 		executeAttackTransfer();
 		

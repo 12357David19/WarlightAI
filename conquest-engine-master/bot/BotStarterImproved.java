@@ -8,8 +8,8 @@ import main.Region;
 import move.AttackTransferMove;
 import move.PlaceArmiesMove;
 
-public class BotStarterImproved implements Bot
-{
+public class BotStarterImproved implements Bot {
+
     @Override
     /**
      * A method used at the start of the game to decide which player start with what Regions. 6 Regions are required to be returned.
@@ -26,7 +26,9 @@ public class BotStarterImproved implements Bot
      * @return The list of PlaceArmiesMoves for one round
      */
     public ArrayList<PlaceArmiesMove> getPlaceArmiesMoves(BotState state, Long timeOut) {
-        ArrayList<PlaceArmiesMove> nextMovesForPlacingArmies = MovesChooser.getMovesForPlacingArmies(state);
+        MovesChooser movesChooser = MovesChooser.getInstance(state);
+        ArrayList<PlaceArmiesMove> nextMovesForPlacingArmies = movesChooser.getMovesForPlacingArmies();
+        MovesChooser.clear();
         return nextMovesForPlacingArmies;
     }
 
@@ -35,9 +37,10 @@ public class BotStarterImproved implements Bot
      * This method is called for at the second part of each round.
      * @return The list of PlaceArmiesMoves for one round
      */
-    public ArrayList<AttackTransferMove> getAttackTransferMoves(BotState state, Long timeOut)
-    {
-        ArrayList<AttackTransferMove> nextMovesForAttackOrTransfer = MovesChooser.getMovesForAttackOrTransferArmies(state);
+    public ArrayList<AttackTransferMove> getAttackTransferMoves(BotState state, Long timeOut) {
+        MovesChooser movesChooser = MovesChooser.getInstance(state);
+        ArrayList<AttackTransferMove> nextMovesForAttackOrTransfer = movesChooser.getMovesForAttackOrTransferArmies();
+        MovesChooser.clear();
         return nextMovesForAttackOrTransfer;
     }
 

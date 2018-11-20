@@ -15,9 +15,37 @@ public class StartingRegionPicker {
      * @param state
      * @return list of preferred starting regions
      */
+    // TODO: implement this method by setting up preferred starting region list, implemented using domain knowledge
     public static ArrayList<Region> getPreferredStartingRegions(BotState state) {
-        // TODO: implement this method by setting up preferred starting region list, implemented using domain knowledge
-        return new ArrayList<>();
+        ArrayList<Region> preferredStartingRegions = new ArrayList<Region>();
+        ArrayList<Region> pickableRegions = state.getPickableStartingRegions();
+
+        for (Region region : pickableRegions) {
+
+            //these regions picked because of their bonuses and locations
+            switch (region.getId()) {
+                case 41:
+                    preferredStartingRegions.add(1, region);
+                    break;
+                case 12:
+                    preferredStartingRegions.add(2, region);
+                    break;
+                case 40:
+                    preferredStartingRegions.add(3, region);
+                    break;
+                case 11:
+                    preferredStartingRegions.add(4, region);
+                    break;
+                case 21:
+                    preferredStartingRegions.add(5, region);
+                    break;
+                case 23:
+                    preferredStartingRegions.add(6, region);
+                    break;
+
+            }
+        }
+        return preferredStartingRegions;
     }
 
 }

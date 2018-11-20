@@ -1,3 +1,6 @@
 *.iml
 *.xml
 .idea/inspectionProfiles/Project_Default.xml
+out/*
+AlphaBetaMinimaxTTT.java
+GFG.java
