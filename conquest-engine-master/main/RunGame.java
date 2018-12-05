@@ -469,8 +469,15 @@ public class RunGame
 
 		Player winner = this.engine.winningPlayer();
 		int score = this.engine.getRoundNr() - 1;
-		System.out.println(winner.getName());
-		System.out.println(score);
+
+		try {
+			System.out.println("Winner is: " + winner.getName());
+			System.out.println("Score of game is: " + String.valueOf(score));
+		} catch (NullPointerException e) {
+			System.out.println("Match is draw");
+			System.out.println("Score of game is: " + String.valueOf(score));
+		}
+
 
 		// DBCollection coll = db.getCollection("games");
 
