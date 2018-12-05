@@ -1,8 +1,10 @@
 package helper;
 
 import bot.BotState;
+import main.Map;
 import main.Region;
 import move.AttackTransferMove;
+import move.MoveResult;
 import move.PlaceArmiesMove;
 
 import java.util.ArrayList;
@@ -15,6 +17,8 @@ import java.util.List;
 public class MovesChooser {
 
     private static BotState botState = null;
+    private static Map mapCopyOfGame = null;
+    private static Map mapBackup = null;
     List<PlaceArmiesMoveWithUtility> rootsChildrenWithUtility = new ArrayList<>();
     private static ArrayList<PlaceArmiesMove> movesForPlacingArmies = null;
     private static ArrayList<AttackTransferMove> movesForAttackOrTransferArmies = null;
@@ -28,6 +32,8 @@ public class MovesChooser {
         if (instance == null) {
             instance = new MovesChooser();
             instance.botState = sentBotState;
+            instance.mapCopyOfGame = instance.botState.getVisibleMap().getMapCopy();
+            instance.mapBackup = instance.botState.getVisibleMap().getMapCopy();
         }
 
         return instance;
@@ -57,7 +63,44 @@ public class MovesChooser {
      */
     // TODO: implement this method using depth limited minimax search, preferably with alpha-beta pruning
     public static ArrayList<AttackTransferMove> getMovesForAttackOrTransferArmies() {
-        return instance.movesForAttackOrTransferArmies;
+        // minimaxWithAlphaBetaPruningForAttackOrTransferArmies(Integer.MIN_VALUE, Integer.MAX_VALUE, 0, true);
+        // return instance.movesForAttackOrTransferArmies;
+
+        ArrayList<AttackTransferMove> attackTransferMoves = new ArrayList<AttackTransferMove>();
+        String myName = instance.botState.getMyPlayerName();
+        int armies = 5;
+
+        for(Region fromRegion : instance.botState.getVisibleMap().getRegions())
+        {
+            if(fromRegion.ownedByPlayer(myName)) //do an attack
+            {
+                ArrayList<Region> possibleToRegions = new ArrayList<Region>();
+                possibleToRegions.addAll(fromRegion.getNeighbors());
+
+                while(!possibleToRegions.isEmpty())
+                {
+                    double rand = Math.random();
+                    int r = (int) (rand*possibleToRegions.size());
+                    Region toRegion = possibleToRegions.get(r);
+
+                    if(!toRegion.getPlayerName().equals(myName) && fromRegion.getArmies() > 6) //do an attack
+                    {
+                        attackTransferMoves.add(new AttackTransferMove(myName, fromRegion, toRegion, armies));
+                        break;
+                    }
+                    else if(toRegion.getPlayerName().equals(myName) && fromRegion.getArmies() > 1) //do a transfer
+                    {
+                        attackTransferMoves.add(new AttackTransferMove(myName, fromRegion, toRegion, armies));
+                        break;
+                    }
+                    else
+                        possibleToRegions.remove(toRegion);
+                }
+            }
+        }
+
+        return attackTransferMoves;
+
     }
 
     // extracts heuristics
@@ -80,45 +123,58 @@ public class MovesChooser {
         return utility;
     }
 
+    private static void addArmies(List<PlaceArmiesMove> moves) {
+
+        String myName = instance.botState.getMyPlayerName();
+        String opponentName = instance.botState.getOpponentPlayerName();
+        instance.mapBackup = instance.mapCopyOfGame;
+
+        for(PlaceArmiesMove move : moves) {
+            if (move.getPlayerName().equals(myName)) {
+                int currentArmies = instance.mapCopyOfGame.getRegion(move.getRegion().getId()).getArmies();
+                currentArmies += move.getArmies();
+                instance.mapCopyOfGame.getRegion(move.getRegion().getId()).setArmies(currentArmies);
+            }
+        }
+
+    }
+
+    private static void removeArmies(List<PlaceArmiesMove> moves) {
+
+        instance.mapCopyOfGame = instance.mapBackup;
+
+    }
+
     private static List<List<PlaceArmiesMove>> getAvailableStates() {
-
-
-
-//
-//        ArrayList<PlaceArmiesMove> placeArmiesMoves = new ArrayList<PlaceArmiesMove>();
-//        String myName = state.getMyPlayerName();
-//        int armies = 2;
-//        int armiesLeft = state.getStartingArmies();
-//        LinkedList<Region> visibleRegions = state.getVisibleMap().getRegions();
-//
-//        while(armiesLeft > 0)
-//        {
-//            double rand = Math.random();
-//            int r = (int) (rand*visibleRegions.size());
-//            Region region = visibleRegions.get(r);
-//
-//            if(region.ownedByPlayer(myName))
-//            {
-//                placeArmiesMoves.add(new PlaceArmiesMove(myName, region, armies));
-//                armiesLeft -= armies;
-//            }
-//        }
-//
-//        return placeArmiesMoves;
-
-
-
-
-
-
 
         // get possible regions for any moves, which is: regions available to place new armies
         int armiesLeft = instance.botState.getStartingArmies();
+        String myName = instance.botState.getMyPlayerName();
         int unitsOfArmiesInBlock = 2;
         int numberOfBlocks = (int) Math.ceil(armiesLeft / unitsOfArmiesInBlock);
         List<Region> visibleRegions = instance.botState.getVisibleMap().getRegions();
-        List<List<Region>> combinationsOfRegions = combinations( visibleRegions, unitsOfArmiesInBlock);
-        for
+        List<List<Region>> combinationsOfRegions = combinations(visibleRegions, numberOfBlocks);
+        List<List<PlaceArmiesMove>> placeArmiesMoves = new ArrayList<>();
+
+        for (List<Region> regions: combinationsOfRegions) {
+            int startArmyNumber = armiesLeft;
+            List<PlaceArmiesMove> setOfPlacesArmiesMoves = new ArrayList<>();
+            int length = regions.size();
+
+            for (int i = 0; i < length; i++) {
+                int index = i;
+                for (int j = 0; j < length; j++) {
+                    int armiesToPlaceThisRegion = (startArmyNumber >= unitsOfArmiesInBlock) ? unitsOfArmiesInBlock : startArmyNumber;
+                    setOfPlacesArmiesMoves.add(new PlaceArmiesMove(myName, regions.get(index%length), armiesToPlaceThisRegion));
+                    startArmyNumber -= armiesToPlaceThisRegion;
+                }
+
+                placeArmiesMoves.add(setOfPlacesArmiesMoves);
+            }
+
+        }
+        
+        return placeArmiesMoves;
 
     }
 
@@ -157,7 +213,8 @@ public class MovesChooser {
             int currentScore = 0;
 
             if (isMaxPlayer) {
-                placeAMove(moves, 1);
+                addArmies(moves);
+                //placeAMove(moves, 1);
                 currentScore = minimaxWithAlphaBetaPruningForPlacingArmies(alpha, beta, depth+1, false);
                 maxValue = Math.max(maxValue, currentScore);
 
@@ -168,7 +225,8 @@ public class MovesChooser {
                     instance.rootsChildrenWithUtility.add(new PlaceArmiesMoveWithUtility(currentScore, moves));
 
             } else {
-                placeAMove(moves, 2);
+                addArmies(moves);
+                //placeAMove(moves, 2);
                 currentScore = minimaxWithAlphaBetaPruningForPlacingArmies(alpha, beta, depth+1, true);
                 minValue = Math.min(minValue, currentScore);
 
@@ -177,7 +235,8 @@ public class MovesChooser {
             }
 
             //reset board
-            board[point.x][point.y] = 0;
+            //board[point.x][point.y] = 0;
+            removeArmies(moves);
 
             // If a pruning has been done, then we don't evaluate the rest of the sibling states
             if ((currentScore == Integer.MAX_VALUE) || (currentScore == Integer.MIN_VALUE))
@@ -187,6 +246,10 @@ public class MovesChooser {
         // stopping criteria 3: if it's
         return isMaxPlayer ? maxValue : minValue;
     }
+
+//    private static int minimaxWithAlphaBetaPruningForAttackOrTransferArmies(int alpha, int beta, int depth, boolean isMaxPlayer) {
+//        return null;
+//    }
 
     static <T> List<List<T>> combinations( List<T> list, int n ){
 
@@ -217,5 +280,5 @@ public class MovesChooser {
 
         return result;
     }
-
+    
 }
